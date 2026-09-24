@@ -1,0 +1,26 @@
+{
+    "id": "134C4AC5",
+    "path": "C:/devspace/LTS-Bowl-2025/dat/df_total_points.csv",
+    "project_path": "dat/df_total_points.csv",
+    "type": "text",
+    "hash": "2563841484",
+    "contents": "",
+    "dirty": false,
+    "created": 1758116165942.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "11,34",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1758116180,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1758116180606,
+    "read_only": false,
+    "read_only_alternatives": []
+}

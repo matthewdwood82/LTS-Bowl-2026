@@ -1,0 +1,26 @@
+{
+    "id": "A074C464",
+    "path": "C:/devspace/LTS-Bowl-2025/R/get_conn.R",
+    "project_path": "R/get_conn.R",
+    "type": "r_source",
+    "hash": "1862340623",
+    "contents": "",
+    "dirty": false,
+    "created": 1757528414334.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "12,15",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1757384689,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1757384689,
+    "read_only": false,
+    "read_only_alternatives": []
+}
