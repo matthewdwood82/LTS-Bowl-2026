@@ -54,7 +54,15 @@ df_scores <- purrr::map(lts_conn, ~ ff_schedule(.x)) %>%
 # write df_scores
 readr::write_csv(df_scores, "dat/df_scores.csv")
 
-# define weekly categories so we can sort by ordered list in full df_weekly later
+# ---------------------------------------------------------------------------
+# WEEKLY AWARDS
+# Six categories, one table. Every category produces the same eight columns and
+# differs only in how it picks the awardee row(s) within each week, so each one
+# is just a label plus a `pick` function below.
+#
+# `v_category` sets the display order of the categories within a week.
+# ---------------------------------------------------------------------------
+
 v_category <-
   ordered(
     c(
@@ -67,109 +75,63 @@ v_category <-
     )
   )
 
-df_weekly_blowout <- df_scores %>%
-  dplyr::group_by(week) %>%
-  dplyr::filter(result == "W", diff_score == max(diff_score)) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Category = v_category[1]) %>%
-  dplyr::select(
-    Week = week,
-    Category,
-    League = league,
-    Awardee = franchise_name,
-    Opponent = franchise_name_opponent,
-    `Awardee Score` = franchise_score,
-    `Opponent Score` = opponent_score,
-    Difference = diff_score
+# NOTE: keep this list in alphabetical order by name. dplyr::arrange() is
+# stable, so when two rows tie on Week + Category the order they were stacked
+# in is what breaks the tie in the published table.
+l_weekly_awards <- list(
+  blowout = list(
+    category = "Biggest Blowout",
+    pick = function(df) dplyr::filter(df, result == "W", diff_score == max(diff_score))
+  ),
+  fewest_points_win = list(
+    category = "Fewest Points in Win",
+    pick = function(df) {
+      df %>%
+        dplyr::filter(result == "W") %>%
+        dplyr::filter(franchise_score == min(franchise_score))
+    }
+  ),
+  highest_score = list(
+    category = "Highest Score",
+    pick = function(df) dplyr::filter(df, franchise_score == max(franchise_score))
+  ),
+  lowest_score = list(
+    category = "Lowest Score",
+    pick = function(df) dplyr::filter(df, franchise_score == min(franchise_score))
+  ),
+  most_points_loss = list(
+    category = "Most Points in Loss",
+    pick = function(df) dplyr::filter(df, result == "L", opponent_score == max(opponent_score))
+  ),
+  narrow_win = list(
+    category = "Narrowest Win",
+    pick = function(df) dplyr::filter(df, result == "W", diff_score == min(diff_score))
   )
+)
 
-df_weekly_narrow_win <- df_scores %>%
-  dplyr::group_by(week) %>%
-  dplyr::filter(result == "W", diff_score == min(diff_score)) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Category = v_category[2]) %>%
-  dplyr::select(
-    Week = week,
-    Category,
-    League = league,
-    Awardee = franchise_name,
-    Opponent = franchise_name_opponent,
-    `Awardee Score` = franchise_score,
-    `Opponent Score` = opponent_score,
-    Difference = diff_score
-  )
+# apply one award definition to df_scores, week by week
+get_weekly_award <- function(award) {
+  pick <- award$pick
 
-df_weekly_fewest_points_win <- df_scores %>%
-  dplyr::group_by(week) %>%
-  dplyr::filter(result == "W") %>%
-  dplyr::filter(franchise_score == min(franchise_score)) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Category = v_category[3]) %>%
-  dplyr::select(
-    Week = week,
-    Category,
-    League = league,
-    Awardee = franchise_name,
-    Opponent = franchise_name_opponent,
-    `Awardee Score` = franchise_score,
-    `Opponent Score` = opponent_score,
-    Difference = diff_score
-  )
+  df_scores %>%
+    dplyr::group_by(week) %>%
+    pick() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(Category = factor(award$category, levels = levels(v_category), ordered = TRUE)) %>%
+    dplyr::select(
+      Week = week,
+      Category,
+      League = league,
+      Awardee = franchise_name,
+      Opponent = franchise_name_opponent,
+      `Awardee Score` = franchise_score,
+      `Opponent Score` = opponent_score,
+      Difference = diff_score
+    )
+}
 
-df_weekly_most_points_loss <- df_scores %>%
-  dplyr::group_by(week) %>%
-  dplyr::filter(result == "L", opponent_score == max(opponent_score)) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Category = v_category[4]) %>%
-  dplyr::select(
-    Week = week,
-    Category,
-    League = league,
-    Awardee = franchise_name,
-    Opponent = franchise_name_opponent,
-    `Awardee Score` = franchise_score,
-    `Opponent Score` = opponent_score,
-    Difference = diff_score
-  )
-
-df_weekly_highest_score <- df_scores %>%
-  dplyr::group_by(week) %>%
-  dplyr::filter(franchise_score == max(franchise_score)) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Category = v_category[5]) %>%
-  dplyr::select(
-    Week = week,
-    Category,
-    League = league,
-    Awardee = franchise_name,
-    Opponent = franchise_name_opponent,
-    `Awardee Score` = franchise_score,
-    `Opponent Score` = opponent_score,
-    Difference = diff_score
-  )
-
-df_weekly_lowest_score <- df_scores %>%
-  dplyr::group_by(week) %>%
-  dplyr::filter(franchise_score == min(franchise_score)) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Category = v_category[6]) %>%
-  dplyr::select(
-    Week = week,
-    Category,
-    League = league,
-    Awardee = franchise_name,
-    Opponent = franchise_name_opponent,
-    `Awardee Score` = franchise_score,
-    `Opponent Score` = opponent_score,
-    Difference = diff_score
-  )
-
-
-# collect weekly categories
-v_weekly_dfs <- ls(pattern = "df_weekly_")
-
-df_weekly <- mget(v_weekly_dfs) %>%
-  purrr::set_names(nm = v_weekly_dfs) %>%
+df_weekly <- l_weekly_awards %>%
+  purrr::map(get_weekly_award) %>%
   dplyr::bind_rows() %>%
   dplyr::arrange(dplyr::desc(Week), factor(Category, levels = v_category))
 
@@ -197,27 +159,6 @@ df_total_points <- df_scores %>%
 
 # write df_total_points
 readr::write_csv(df_total_points, "dat/df_total_points.csv")
-
-
-# # playoffs
-# v_bracket <- rep(c("winners_bracket", "losers_bracket"), 5)
-# 
-# v_league_id <- rep(unlist(purrr::map(lts_conn, "league_id")), 2) %>% sort()
-# 
-# v_query <- glue::glue("league/{v_league_id}/{v_bracket}")
-# 
-# v_query_string <- purrr::map(v_query, ~rep(.x, 4)) %>% unlist(.)
-# 
-# df_playoffs <- purrr::map(v_query, ~ffscrapr::sleeper_getendpoint(.x)) %>% 
-#   purrr::map(., `[`, c("content", "query")) %>%
-#   # purrr::set_names(purrr::map(., "query")) %>% 
-#   dplyr::bind_rows(.id = "league_id") %>% 
-#   dplyr::mutate(league = names(v_league_id[as.numeric(league_id)]),
-#     league_id = v_league_id[as.numeric(league_id)]) %>% 
-#   tidyr::unnest_wider(content)  %>% 
-#   tidyr::unnest_wider(t1_from, names_sep = "_")  %>%
-#   tidyr::unnest_wider(t2_from, names_sep = "_")
-
 
 
 # ---------------------------------------------------------------------------
