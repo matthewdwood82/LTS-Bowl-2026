@@ -30,19 +30,8 @@ df_franchises <-
   dplyr::bind_rows(.id = "league") |> 
   dplyr::mutate(league = recode(league, !!!v_rename))
 
-# current week
-this_week <- difftime(lubridate::now(), lubridate::ymd("2026-09-08"), units = "weeks") %>% ceiling() %>% as.integer()
-
-# week number for update
-update_week <- difftime(
-  lubridate::now(tz = "America/New_York"),
-  # TUE before the first THU night game
-  # so it says results are final for week just completed on 1130a scheduled run
-  lubridate::ymd_hms("2026-09-07 11:00:00", tz = "America/New_York"),
-  units = "weeks"
-) %>%
-  floor() %>%  as.integer()
-# update_week <- 17
+# this_week, update_week, survival_max_week and survival_source all come from
+# R/config.R (sourced by R/get_conn.R above)
 readr::write_lines(update_week, "./dat/update_week.txt")
 
 # get all scores for each week
@@ -231,11 +220,16 @@ readr::write_csv(df_total_points, "dat/df_total_points.csv")
 
 
 
-# survived teams
+# ---------------------------------------------------------------------------
+# SURVIVOR POOL
+# Three teams are eliminated each week. `survival_max_week` and
+# `survival_source` are set in R/config.R.
+# ---------------------------------------------------------------------------
+
 df_week_list <- df_scores %>%
-  # hardcode until we resolve the playoff score reporting
-  dplyr::filter(week < 15) %>%
-  # dplyr::filter(week <= update_week) %>%
+  # only score COMPLETED weeks; including the in-progress week eliminates
+  # teams on partial (often 0.00) scores
+  dplyr::filter(week <= survival_max_week) %>%
   dplyr::arrange(week) %>%
   dplyr::group_by(league, franchise_id) %>%
   dplyr::mutate(cum_franchise_score = cumsum(franchise_score)) %>%
@@ -245,62 +239,88 @@ df_week_list <- df_scores %>%
 # get max week in data, i.e., the current week
 v_max_week <- length(df_week_list)
 
+if (v_max_week < 1) {
+  # before any week has finished there is nobody to eliminate yet; write empty
+  # tables so the site still renders
+  df_empty <- df_scores[0, ] %>%
+    dplyr::mutate(cum_franchise_score = double())
 
-# get manual survival table
-# df_survived_manual <- readr::read_csv("dat/df_survived_manual.csv")
+  df_empty %>%
+    dplyr::select(
+      `Survival Week` = week,
+      League = league,
+      Team = franchise_name,
+      Owner = user_name,
+      Score = franchise_score,
+      `Cumulative Score` = cum_franchise_score
+    ) %>%
+    readr::write_csv("dat/df_survived.csv")
 
-# get survival table for wk 1-15
-df_survived <- df_week_list %>%
-  purrr::accumulate(\(x, d) {
-    d %>%
-      dplyr::filter(franchise_name %in% x$franchise_name) %>%
-      # to break ties, I add in a _very_ small portion of the cumulative franchise score
-      # the effect is that any ties are broken using lowest cumulative score
-      dplyr::slice_max(
-        order_by = (franchise_score + .00001 * cum_franchise_score),
-        n = -3,
-        with_ties = FALSE
-      )
-  }, .init = df_week_list$`1`) %>% 
-  tail(-1)
+  df_empty %>%
+    dplyr::select(
+      `Eliminated Week` = week,
+      League = league,
+      Team = franchise_name,
+      Owner = user_name,
+      Score = franchise_score,
+      `Cumulative Score at Elimination` = cum_franchise_score
+    ) %>%
+    readr::write_csv("dat/df_eliminated.csv")
+} else if (identical(survival_source, "manual")) {
+  # hand-maintained tables win outright once Sleeper stops reporting scores
+  # for non-bracket teams in the playoffs
+  readr::read_csv("dat/df_survived_manual.csv", show_col_types = FALSE) %>%
+    readr::write_csv("dat/df_survived.csv")
 
-# write df_survived
-df_survived %>%
-  dplyr::bind_rows() %>%
-  dplyr::select(
-    `Survival Week` = week,
-    League = league,
-    Team = franchise_name,
-    Owner = user_name,
-    Score = franchise_score,
-    `Cumulative Score` = cum_franchise_score
-  ) %>%
-  # dplyr::bind_rows(df_survived_manual) %>%
-  dplyr::arrange(desc(`Survival Week`), desc(Score)) %>%
-  readr::write_csv(., "dat/df_survived.csv")
+  readr::read_csv("dat/df_eliminated_manual.csv", show_col_types = FALSE) %>%
+    readr::write_csv("dat/df_eliminated.csv")
+} else {
+  # get survival table
+  df_survived <- df_week_list %>%
+    purrr::accumulate(\(x, d) {
+      d %>%
+        dplyr::filter(franchise_name %in% x$franchise_name) %>%
+        # to break ties, I add in a _very_ small portion of the cumulative franchise score
+        # the effect is that any ties are broken using lowest cumulative score
+        dplyr::slice_max(
+          order_by = (franchise_score + .00001 * cum_franchise_score),
+          n = -3,
+          with_ties = FALSE
+        )
+    }, .init = df_week_list[[1]]) %>%
+    tail(-1)
 
+  # write df_survived
+  df_survived %>%
+    dplyr::bind_rows() %>%
+    dplyr::select(
+      `Survival Week` = week,
+      League = league,
+      Team = franchise_name,
+      Owner = user_name,
+      Score = franchise_score,
+      `Cumulative Score` = cum_franchise_score
+    ) %>%
+    dplyr::arrange(desc(`Survival Week`), desc(Score)) %>%
+    readr::write_csv(., "dat/df_survived.csv")
 
-# # get manual eliminated table
-# df_eliminated_manual <- readr::read_csv("dat/df_eliminated_manual.csv")
+  # get eliminated table by anti-joining with survival table
+  df_eliminated <-
+    purrr::map2(.x = df_week_list, .y = df_survived, ~ dplyr::anti_join(.x, .y, by = c("league", "week", "franchise_id"))) %>%
+    dplyr::bind_rows() %>%
+    dplyr::group_by(league, franchise_id) %>%
+    dplyr::filter(week == min(week)) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(
+      `Eliminated Week` = week,
+      League = league,
+      Team = franchise_name,
+      Owner = user_name,
+      Score = franchise_score,
+      `Cumulative Score at Elimination` = cum_franchise_score
+    ) %>%
+    dplyr::arrange(desc(`Eliminated Week`), desc(Score))
 
-# get eliminated table by anti-joining with survival table
-df_eliminated <-
-  purrr::map2(.x = df_week_list, .y = df_survived, ~ dplyr::anti_join(.x, .y, by = c("league", "week", "franchise_id"))) %>%
-  dplyr::bind_rows() %>%
-  dplyr::group_by(league, franchise_id) %>%
-  dplyr::filter(week == min(week)) %>%
-  dplyr::ungroup() %>%
-  dplyr::select(
-    `Eliminated Week` = week,
-    League = league,
-    Team = franchise_name,
-    Owner = user_name,
-    Score = franchise_score,
-    `Cumulative Score at Elimination` = cum_franchise_score
-  ) %>% 
-  # dplyr::bind_rows(df_eliminated_manual) %>%
-  dplyr::arrange(desc(`Eliminated Week`), desc(Score))
-  
-
-# write df_eliminated
-readr::write_csv(df_eliminated, "dat/df_eliminated.csv")
+  # write df_eliminated
+  readr::write_csv(df_eliminated, "dat/df_eliminated.csv")
+}

@@ -26,8 +26,7 @@ df_franchises <- purrr::map(lts_conn, ~ ffscrapr::ff_franchises(.x)) %>%
   # renames leagues to the name in the app
   dplyr::mutate(league = recode(league, !!!v_rename))
 
-# current week
-this_week <- difftime(lubridate::now(), lubridate::ymd("2026-09-08"), units = "weeks") %>% ceiling() %>% as.integer()
+# current week (this_week comes from R/config.R via R/get_conn.R)
 
 # get rosters for each week and team
 df_rosters <- purrr::map(1:this_week,
@@ -43,7 +42,7 @@ df_rosters <- purrr::map(1:this_week,
   # dplyr::select()
   
   # get scores for each league, week, and team
-  df_scoring_history <- purrr::map(lts_conn, ~ ffscrapr::ff_scoringhistory(.x, season = 2025)) %>%
+  df_scoring_history <- purrr::map(lts_conn, ~ ffscrapr::ff_scoringhistory(.x, season = season)) %>%
   dplyr::bind_rows(.id = "league") %>%
   dplyr::select(league, week, sleeper_id, player_name, points) |> 
   dplyr::mutate(

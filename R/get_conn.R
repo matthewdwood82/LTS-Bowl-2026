@@ -1,13 +1,10 @@
-lts_conn <- c(
-  "1384249414998052864",
-  "1386830574496284672",
-  "1386831161682038784",
-  "1386831051346698240"
-) %>%
-  purrr::set_names("L1", "L2", "L3", "L4") %>%
+# season-specific settings live in R/config.R -- edit that file, not this one
+source("R/config.R")
+
+lts_conn <- v_league_ids %>%
   purrr::map(.x = .,
              ~ ffscrapr::ff_connect(
                league_id = .x,
                platform = "sleeper",
-               season = 2026
+               season = season
              ))
