@@ -2,12 +2,11 @@ on:
   workflow_dispatch:
   push:
     branches: [main, master]
-  # schedule:
-  #   # COMMENT OUT TO GOTO MANUAL FOR END-OF-YEAR ELIMINATOR AND LTS BOWL  
-  #   # 11.30a EDT TUE (in UTC) for SUN & MON 8p gamescore updates and final stat corrections
-  #   - cron: '30 15 * 9-12,1-2 2'
-    
-    
+  schedule:
+    # COMMENT OUT TO GO MANUAL FOR END-OF-YEAR ELIMINATOR AND LTS BOWL
+    # 11.30a EDT TUE (in UTC) for SUN & MON 8p gamescore updates and final stat corrections
+    - cron: '30 15 * 9-12,1-2 2'
+
 name: Update Scores
 
 permissions:
