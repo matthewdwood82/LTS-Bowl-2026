@@ -81,23 +81,23 @@ source("R/get_conn.R")
 
 ## Intro
 
-Welcome to the scoring and transaction site for the Living the Stream Bowl 2026!
+Welcome to the scoring and transaction site for the Living the Stream Bowl `r season`!
 
 Individual Sleeper league sites and League Managers, you may have to ask LMs for league "view only" access:
 
--   [L1](https://sleeper.com/leagues/1384249414998052864) - [\@Weagle85](https://discord.com/channels/@me/1142996811498397816)
+-   [L1](https://sleeper.com/leagues/`r v_league_ids[["L1"]]`) - [\@Weagle85](https://discord.com/channels/@me/1142996811498397816)
 
--   [L2](https://sleeper.com/leagues/1386830574496284672) - [\@Aaron](https://discord.com/channels/@me/1143739424119726180)
+-   [L2](https://sleeper.com/leagues/`r v_league_ids[["L2"]]`) - [\@Aaron](https://discord.com/channels/@me/1143739424119726180)
 
--   [L3](https://sleeper.com/leagues/1386831161682038784)- [\@dereknotderrick](https://discord.com/channels/@me/1148606137432817754)
+-   [L3](https://sleeper.com/leagues/`r v_league_ids[["L3"]]`)- [\@dereknotderrick](https://discord.com/channels/@me/1148606137432817754)
 
--   [L4](https://sleeper.com/leagues/1386831051346698240) - [\@apulianas](https://discord.com/channels/@me/293937564447145994)
+-   [L4](https://sleeper.com/leagues/`r v_league_ids[["L4"]]`) - [\@apulianas](https://discord.com/channels/@me/293937564447145994)
 
 For scoring site issues and questions, please reach out to Matt Wood by [email](mailto:matthewdwood82@gmail.com) or [Discord](https://discord.com/channels/@me/838756468014186582).
 
 ## Bylaws
 
-Bylaws for the league are available here, reach out to LTS commish Greg Bryant by [email](mailto:lts.leaguecommish@gmail.com) or on [Discord](https://discord.com/channels/@me/1142996811498397816) for access: [2026 bylaws](https://docs.google.com/document/d/1AwISf60JVImIF1K_NXLk-1y9ZoIbOb3GG3hkCXPLiDM/edit?usp=sharing)
+Bylaws for the league are available here, reach out to LTS commish Greg Bryant by [email](mailto:lts.leaguecommish@gmail.com) or on [Discord](https://discord.com/channels/@me/1142996811498397816) for access: [`r season` bylaws](https://docs.google.com/document/d/1AwISf60JVImIF1K_NXLk-1y9ZoIbOb3GG3hkCXPLiDM/edit?usp=sharing)
 
 ## Scoring
 
@@ -247,7 +247,7 @@ df_all_transactions <- purrr::map(lts_conn, ~ ff_transactions(.x)) %>%
   dplyr::bind_rows(.id = "league") %>%
   arrange(desc(timestamp), league) %>%
   mutate(
-    week = difftime(timestamp, lubridate::ymd("2026-09-08"), units = "weeks") %>% ceiling(.) %>% as.integer(.) %>% if_else(. < 0L, 0L, .),
+    week = difftime(timestamp, season_anchor, units = "weeks") %>% ceiling(.) %>% as.integer(.) %>% if_else(. < 0L, 0L, .),
     timestamp = toupper(format(lubridate::with_tz(timestamp, tzone="America/New_York"), "%a %Y-%m-%d %H:%M:%S %Z"))
   ) %>%
   select(league, week, everything())
