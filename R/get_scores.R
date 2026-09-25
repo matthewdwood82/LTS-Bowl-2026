@@ -1,18 +1,5 @@
-# data ingest
-library(ffscrapr)
-library(curl)
-library(readr)
-library(glue)
-
-# data munging
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(lubridate)
-library(purrr)
-
-# data display and interaction
-library(DT)
+# packages (shared with index.qmd)
+source("R/libraries.R")
 
 # get connection to Sleeper leagues
 source("R/get_conn.R")
