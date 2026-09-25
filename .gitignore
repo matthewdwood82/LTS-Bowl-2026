@@ -1,3 +1,17 @@
+# Quarto build artifacts
 /.quarto/
 **/*.quarto_ipynb
 /_site/
+
+# rendered site output -- published to the gh-pages branch by GitHub Actions,
+# never committed to main
+/index.html
+/index_files/
+
+# RStudio / R per-user state
+.Rproj.user/
+.Rhistory
+.Rdata
+.RData
+.httr-oauth
+.DS_Store
