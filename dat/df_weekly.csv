@@ -1,27 +1,22 @@
 Week,Category,League,Awardee,Opponent,Awardee Score,Opponent Score,Difference
-3,Highest Score,The Only Legitimate LTS Bowl League - L3,Egg Chasers,johnnysmomskid,52.3,0,52.3
-3,Lowest Score,LTS Bowl - L1,Weagle85,Mr. High Tea,0,0,0
-3,Lowest Score,LTS Bowl - L1,Mr. High Tea,Weagle85,0,0,0
-3,Lowest Score,LTS Bowl - L1,fantasyscott,Horsey Sauce,0,0,0
-3,Lowest Score,LTS Bowl - L1,Horsey Sauce,fantasyscott,0,0,0
-3,Lowest Score,LTS Bowl - L1,Fozberry64,Chillin Like a McMillan,0,48.4,48.4
-3,Lowest Score,LTS Bowl - L2,Vandelay Industries,aspires,0,0,0
-3,Lowest Score,LTS Bowl - L2,Natanab,Byronchenko,0,5.35,5.35
-3,Lowest Score,LTS Bowl - L2,Randomizer Intern Program,Crotch Crickets,0,46.95,46.95
-3,Lowest Score,LTS Bowl - L2,aspires,Vandelay Industries,0,0,0
-3,Lowest Score,LTS Bowl - L2,AJ's Animals ,DeadEndFriends,0,27.65,27.65
-3,Lowest Score,LTS Bowl - L2,All roads,Dr. Poop Show,0,23.1,23.1
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,johnnysmomskid,Egg Chasers,0,52.3,52.3
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,Speaks Kindly Holds Knife,SycamoreFlynns,0,0,0
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,39ers,Turd Ferguson,0,20.75,20.75
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,SycamoreFlynns,Speaks Kindly Holds Knife,0,0,0
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,SOTBD,caemeron,0,0,0
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,Greenhorns,WilhelmTilt,0,14.24,14.24
-3,Lowest Score,The Only Legitimate LTS Bowl League - L3,caemeron,SOTBD,0,0,0
-3,Lowest Score,LTS Bowl - L4,Chiotan Deck,The New Age Process,0,4.2,4.2
-3,Lowest Score,LTS Bowl - L4,outshine13,The Lib Owners,0,1,1
-3,Lowest Score,LTS Bowl - L4,Trailer Park Pimpin',Poop on the Cob,0,32.82,32.82
-3,Lowest Score,LTS Bowl - L4,Shake and Bake,West Coast Aunt,0,46.95,46.95
+5,Biggest Blowout,LTS Bowl - L2,AJ's Animals ,Vandelay Industries,185.89,88.42,97.46999999999998
+5,Narrowest Win,LTS Bowl - L4,Bowers to your Sensei,Poop on the Cob,199.66,199.33,0.3299999999999841
+5,Fewest Points in Win,LTS Bowl - L2,aspires,Natanab,117.72,115.25,2.469999999999999
+5,Most Points in Loss,LTS Bowl - L2,Randomizer Intern Program,Dr. Poop Show,135.94,218.89,82.94999999999999
+5,Highest Score,LTS Bowl - L2,Dr. Poop Show,Randomizer Intern Program,218.89,135.94,82.94999999999999
+5,Lowest Score,LTS Bowl - L4,The New Age Process,Shake and Bake,83.29,161.67,78.37999999999998
+4,Biggest Blowout,LTS Bowl - L2,Natanab,"Your Mother, Actually….",189.65,120.28,69.37
+4,Narrowest Win,LTS Bowl - L2,DeadEndFriends,Randomizer Intern Program,146.56,146.03,0.5300000000000011
+4,Fewest Points in Win,The Only Legitimate LTS Bowl League - L3,Egg Chasers,39ers,145.18,133.92,11.26000000000002
+4,Most Points in Loss,LTS Bowl - L4,Bowers to your Sensei,Trailer Park Pimpin',159.63,205.04,45.41
+4,Highest Score,LTS Bowl - L4,Trailer Park Pimpin',Bowers to your Sensei,205.04,159.63,45.41
+4,Lowest Score,LTS Bowl - L4,The New Age Process,West Coast Aunt,107.51,166.78,59.269999999999996
+3,Biggest Blowout,LTS Bowl - L1,Mr. High Tea,Weagle85,200.15,125.04,75.11
+3,Narrowest Win,LTS Bowl - L1,Fozberry64,Chillin Like a McMillan,150.24,150.07,0.17000000000001592
+3,Fewest Points in Win,The Only Legitimate LTS Bowl League - L3,Turd Ferguson,39ers,124.57,98.1,26.47
+3,Most Points in Loss,The Only Legitimate LTS Bowl League - L3,Speaks Kindly Holds Knife,SycamoreFlynns,140.71,212.26,71.54999999999998
+3,Highest Score,The Only Legitimate LTS Bowl League - L3,SycamoreFlynns,Speaks Kindly Holds Knife,212.26,140.71,71.54999999999998
+3,Lowest Score,The Only Legitimate LTS Bowl League - L3,39ers,Turd Ferguson,98.1,124.57,26.47
 2,Biggest Blowout,LTS Bowl - L4,Chiotan Deck,Shake and Bake,238.18,118.26,119.92
 2,Narrowest Win,LTS Bowl - L2,"Your Mother, Actually….",Randomizer Intern Program,154.9,153.65,1.25
 2,Fewest Points in Win,The Only Legitimate LTS Bowl League - L3,WilhelmTilt,Closet Poopers,110.11,85.52,24.590000000000003
